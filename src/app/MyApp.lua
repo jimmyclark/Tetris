@@ -12,6 +12,7 @@ function MyApp:ctor()
 end
 
 function MyApp:run()
+    math:newrandomseed(tostring(os.time()):reverse():sub(1,6))
     cc.FileUtils:getInstance():addSearchPath("res/")
     cc.Director:getInstance():setContentScaleFactor(720/CONFIG_SCREEN_HEIGHT)
     self:enterScene("app.scene.MainScene")
