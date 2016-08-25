@@ -125,7 +125,7 @@ function MainScene:onMyTimeChanged()
 	end
 
 	-- deal with some case
-	-- self:judgeSomethingException();
+	self:judgeSomethingException();
 
 	self:concatMyShape();
 
@@ -134,6 +134,10 @@ function MainScene:onMyTimeChanged()
 	self:drawMyShape();
 
 	return true;
+end
+
+function MainScene:judgeSomethingException()
+	
 end
 
 function MainScene:concatMyShape()
@@ -174,6 +178,9 @@ function MainScene:clearLastShape()
 end
 
 function MainScene:drawMyShape()
+	-- record last Gone
+	self.m_lastGone = {};
+
 	for i = 1,#self.m_myTetris do 
 		for j =1,#self.m_myTetris[i] do
 			
@@ -185,8 +192,6 @@ function MainScene:drawMyShape()
 
 				self.m_myBgTetris[i][j] = display.newRect(rectParam,extraParam)
 
-				-- record last Gone
-				self.m_lastGone = {};
 
 				self.m_lastGone[#self.m_lastGone+1] = {x=i,y=j};
 
@@ -194,8 +199,6 @@ function MainScene:drawMyShape()
 			end
 		end
 	end
-
-	dump(self.m_lastGone)
 end
 
 function MainScene:onCleanup()
