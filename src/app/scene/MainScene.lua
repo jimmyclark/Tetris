@@ -26,8 +26,9 @@ function MainScene:ctor()
     self.m_myBgTetris = {};
 
     self.m_myTetris = {}; -- my block 
+    self.m_myHaveTetris = {}; -- my block which I have
 
-    self.m_distant = 1; -- my time change
+    self.m_distant = 0.2; -- my time change
 
     self.m_startPosition = {};
 
@@ -52,10 +53,12 @@ function MainScene:initMyFaceBg()
     for i = 1,PLAYER_FACEW do 
     		self.m_myBgTetris[i] = {};
     		self.m_myTetris[i] = {};
+    		self.m_myHaveTetris[i] = {};
     	for j = 1,PLAYER_FACEH do 
     		local rectParam = {x=startX + TETRIS_WIDTH*j,y=startY + TETRIS_HEIGHT*i,width=TETRIS_WIDTH,height=TETRIS_HEIGHT};
     		self.m_myBgTetris[i][j] = display.newRect(rectParam,extraParam);
     		self.m_myTetris[i][j] = 0; -- 初始化状态均为0
+    		self.m_myHaveTetris[i][j] = 0;
     		self:addChild(self.m_myBgTetris[i][j]);
     	end
     end
@@ -127,7 +130,9 @@ function MainScene:onMyTimeChanged()
 	-- deal with some case
 	self:judgeSomethingException();
 
-	self:concatMyShape();
+	if not self:concatMyShape() then 
+		return true;
+	end
 
 	self:clearLastShape();
 
@@ -144,11 +149,48 @@ function MainScene:concatMyShape()
 	local currentShow = PLAYER_FACEW - self.m_currentPosH + 1;
 
 	local showTableNum = currentShow <= 4 and currentShow or 4;
+
+	-- get to the bottom
+	if self.m_currentPosH < 0 then 
+		self:reDropAnim();
+		return false;
+	end
+
+
 	for i = 1,showTableNum do 
 		for j = 1,4 do 
-			self.m_myTetris[self.m_currentPosH + i - 1 ][self.m_currentPosW + j] = self.m_currentShape[i][j];
+			if self.m_myHaveTetris[self.m_currentPosH + i - 1 ] and
+			   self.m_myHaveTetris[self.m_currentPosH + i - 1 ][self.m_currentPosW + j] == 1 then 
+			   self.m_myNeedReturn = true;
+			   if self.m_currentShape[i][j] == 1 then  
+			   		self.m_myNeedReturn = false;
+					self:reDropAnim();
+					return false;
+				end
+			end
+			if self.m_myTetris[self.m_currentPosH + i - 1 ] then 
+				if self.m_myNeedReturn and self.m_currentShape[i][j] == 0 then 
+
+				else
+					if self.m_myNeedReturn then 
+						print(i,j,self.m_currentShape[i][j])
+						self.m_myTetris[self.m_currentPosH]
+						return;
+					end
+					self.m_myTetris[self.m_currentPosH + i - 1 ][self.m_currentPosW + j] = self.m_currentShape[i][j];
+				end
+			end
 		end 
 	end
+	return true;
+end
+
+function MainScene:reDropAnim()
+	self.m_currentPosH = PLAYER_FACEW;
+	for i = 1,#self.m_lastGone do 
+		self.m_myHaveTetris[self.m_lastGone[i].x][self.m_lastGone[i].y] = 1;
+	end
+	self.m_lastGone = {};
 end
 
 function MainScene:toStringRect()
