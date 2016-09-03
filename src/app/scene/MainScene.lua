@@ -28,7 +28,7 @@ function MainScene:ctor()
     self.m_myTetris = {}; -- my block 
     self.m_myHaveTetris = {}; -- my block which I have
 
-    self.m_distant = 0.2; -- my time change
+    self.m_distant = 1; -- my time change
 
     self.m_startPosition = {};
 
@@ -98,8 +98,35 @@ function MainScene:initShape()
 					   	  },
 	};
 
+	self.m_LrectShape = {
+						  {
+							{0,0,0,0},
+							{1,0,0,0},
+							{1,1,1,1},
+							{0,0,0,0}
+					   	  },
+					   	  {
+					   	  	{0,1,1,0},
+					   	  	{0,1,0,0},
+					   	  	{0,1,0,0},
+					   	  	{0,1,0,0}
+					   	  },
+					   	  {
+					   	  	{0,0,0,0},
+					   	  	{1,1,1,1},
+					   	  	{0,0,0,1},
+					   	  	{0,0,0,0}
+					   	  },
+					   	  {
+					   	  	{0,0,1,0},
+					   	  	{0,0,1,0},
+					   	  	{0,0,1,0},
+					   	  	{0,1,1,0}
+					   	  },
+	};
+
 	-- all shape table
-	self.m_shapeTable = {self.m_rectShape};
+	self.m_shapeTable = {self.m_LrectShape};
 end
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -107,7 +134,7 @@ end
 ----------------------------------------------------------- Start Game ---------------------------------------------------------------------------------- 
 function MainScene:calculateShape()
 	local randomType = math.floor(math.random(1,#self.m_shapeTable));
-	self.m_currentShape = self.m_rectShape[randomType]; 
+	self.m_currentShape = self.m_shapeTable[randomType]; 
 end
 
 function MainScene:startGame()
@@ -127,18 +154,21 @@ function MainScene:onMyTimeChanged()
 		self.m_currentPosH = self.m_currentPosH - 1;
 	end
 
-	-- deal with some case
-	self:judgeSomethingException();
+	-- -- deal with some case
+	-- self:judgeSomethingException();
 
-	if not self:concatMyShape() then 
-		return true;
-	end
+	self:concatMyShape();
 
-	self:clearLastShape();
+	dump(self.m_myTetris)
+	-- if not self:concatMyShape() then 
+	-- 	return true;
+	-- end
 
-	self:drawMyShape();
+	-- self:clearLastShape();
 
-	return true;
+	-- self:drawMyShape();
+
+	return false;
 end
 
 function MainScene:judgeSomethingException()
@@ -159,26 +189,20 @@ function MainScene:concatMyShape()
 
 	for i = 1,showTableNum do 
 		for j = 1,4 do 
-			if self.m_myHaveTetris[self.m_currentPosH + i - 1 ] and
-			   self.m_myHaveTetris[self.m_currentPosH + i - 1 ][self.m_currentPosW + j] == 1 then 
-			   self.m_myNeedReturn = true;
-			   if self.m_currentShape[i][j] == 1 then  
-			   		self.m_myNeedReturn = false;
-					self:reDropAnim();
-					return false;
-				end
-			end
+			-- if self.m_myHaveTetris[self.m_currentPosH + i - 1 ] and
+			--    self.m_myHaveTetris[self.m_currentPosH + i - 1 ][self.m_currentPosW + j] == 1 then 
+			--    self.m_myNeedReturn = true;
+			--    if self.m_currentShape[i][j] == 1 then  
+			--    		self.m_myNeedReturn = false;
+			-- 		self:reDropAnim();
+			-- 		return false;
+			-- 	end
+			-- end
 			if self.m_myTetris[self.m_currentPosH + i - 1 ] then 
-				if self.m_myNeedReturn and self.m_currentShape[i][j] == 0 then 
-
-				else
-					if self.m_myNeedReturn then 
-						print(i,j,self.m_currentShape[i][j])
-						self.m_myTetris[self.m_currentPosH]
-						return;
-					end
+				-- if self.m_myNeedReturn and self.m_currentShape[i][j] == 0 then 
+				-- else
 					self.m_myTetris[self.m_currentPosH + i - 1 ][self.m_currentPosW + j] = self.m_currentShape[i][j];
-				end
+				-- end
 			end
 		end 
 	end
